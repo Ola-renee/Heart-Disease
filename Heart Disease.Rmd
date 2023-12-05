@@ -33,7 +33,7 @@ knitr::opts_chunk$set(
  #  pkgs = c("tree", "rpart", "rpart.plot", "partykit", "rattle", "randomForest"))
 
 # Load packages used in this guide ----
-packages <- c("dplyr","tidyverse", "knitr", "kableExtra","psych",
+packages <- c("readr","dplyr","tidyverse", "knitr", "kableExtra","psych",
               "janitor","tree", "rpart", "rpart.plot", "partykit",
               "rattle", "randomForest", "yardstick","leaps",
               "ggplot2","pROC","separationplot")
@@ -58,8 +58,22 @@ options(knitr.kable.NA = "")
 ```
 
 
-
 ```{r Loading data, echo=FALSE}
 heart_csv <- read_csv("heart.csv.xls")
 ```
+
+
+# Introduction
+# Engaging with Heart Data set
+# Study Design and Methods
+# Data Exploration
+# Regression Model
+## Runnning Algorithms
+## Assessing and Evaluating the Candidate Model
+# Decision Tree
+# Testing and Predicting
+# Clustering
+## Comparing the results
+## Discussion and Limitations
+
 
