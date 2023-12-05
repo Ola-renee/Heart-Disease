@@ -1,0 +1,65 @@
+---
+title: "Predicting Heart Diesea"
+author: "Olachi Mbakwe, Justin Constant, Rebande Olusesi and Evan Settipane"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    latex_engine: xelatex
+    keep_tex: true
+geometry: left=1in,right=1in,top=1in,bottom=1in
+urlcolor: blue
+header-includes:
+  - \usepackage{subfig}
+  - \usepackage{float}
+  - \usepackage{booktabs}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  fig.align = "center",
+	cache = TRUE
+)
+
+```
+
+```{r packages, include=FALSE}
+
+# Packages to install ----
+## tree, rpart, rpart.plot, partykit, rattle, and randomForest
+#install.packages(
+ #  pkgs = c("tree", "rpart", "rpart.plot", "partykit", "rattle", "randomForest"))
+
+# Load packages used in this guide ----
+packages <- c("dplyr","tidyverse", "knitr", "kableExtra","psych",
+              "janitor","tree", "rpart", "rpart.plot", "partykit",
+              "rattle", "randomForest", "yardstick","leaps",
+              "ggplot2","pROC","separationplot")
+
+
+invisible(
+  lapply( 
+    X = packages,
+    FUN = library,
+    character.only = TRUE,
+    quietly = TRUE
+  )
+)
+
+# Set the CRAN mirror
+options(repos = "https://cran.rstudio.com/")
+
+# Set Table Option ----
+options(knitr.kable.NA = "") 
+
+
+```
+
+
+
+```{r Loading data, echo=FALSE}
+heart_csv <- read_csv("heart.csv.xls")
+```
+
