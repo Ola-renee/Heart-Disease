@@ -105,7 +105,47 @@ Data analysis involves employing a range of statistical and machine learning met
 
 
 # Regression Model
+
+## Linear Regression model conceptualizing 
+
+## Logistic Regression Model conceptualizing 
+
 ## Runnning Algorithms
+
+### Linear Regression
+```{r Simple linear Regression example }
+
+```
+
+```{r Professional Summary Table}
+
+```
+
+```{r Multiple linear Regression example}
+
+```
+
+#### Feature selection
+
+```{r Best subsets }
+
+```
+
+```{r backwards selection}
+
+```
+
+```{r Forward selection}
+
+```
+
+```{r stepwise selection}
+
+```
+
+
+
+### Logistic Regression
 
 ## Assessing and Evaluating the Candidate Model
 
