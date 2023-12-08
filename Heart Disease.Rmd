@@ -84,15 +84,13 @@ The BRFSS data collection process involves telephone surveys that inquire about 
 
 Data Selection:
 
--  Demographic variables such as age, gender, and ethnicity were included to assess how heart disease risk varies among different population groups. Understanding these disparities is essential for tailoring interventions.
+-  Demographic variables such as age, gender, and ethnicity were included to assess how heart disease risk varies among different population groups. Understanding these disparities is essential.
 
--  Variables related to behavioral risk factors like smoking status, physical activity, and alcohol consumption were included as they are known contributors to heart disease. Analyzing these factors can shed light on modifiable aspects of heart disease risk.
+-  Variables related to behavioral risk factors like smoking status, physical activity, and alcohol consumption were included as they are known contributors to heart disease.
 
 -  Clinical variables including blood pressure, cholesterol levels, and diabetes status were selected due to their direct impact on heart health. These are critical indicators for assessing an individual's risk of heart disease.
 
-The chosen variables are highly relevant in the context of heart disease. Heart disease is a multifactorial condition influenced by a combination of demographic, behavioral, and clinical factors. These variables allow us to explore the intricate relationships between different risk factors and the likelihood of developing heart disease.
-
-
+The chosen variables are very relevant in the context of heart disease. Heart disease is a multifactorial condition influenced by a combination of demographic, behavioral, and clinical factors. These variables allow us to explore the  relationships between different risk factors and the likelihood of developing heart disease.
 
 
 # Data Preprocessing
@@ -105,19 +103,18 @@ Data analysis involves employing a range of statistical and machine learning met
 
 # Data Exploration
 
-```{r}
 
-library(esquisse)
-### Use esquisse ----
-esquisse::esquisser(data = bechdel_awards, viewer = "browser")
-
-```
 # Regression Model
 ## Runnning Algorithms
+
 ## Assessing and Evaluating the Candidate Model
+
 # Decision Tree
+
 # Testing and Predicting
+
 # Clustering
+
 ## Comparing the results
 ## Discussion and Limitations
 
