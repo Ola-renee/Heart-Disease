@@ -1,0 +1,214 @@
+---
+title: "Predicting Heart Diesea"
+author: "Olachi Mbakwe, Justin Constant, Rebande Olusesi and Evan Settipane"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    latex_engine: xelatex
+    keep_tex: true
+geometry: left=1in,right=1in,top=1in,bottom=1in
+urlcolor: blue
+header-includes:
+  - \usepackage{subfig}
+  - \usepackage{float}
+  - \usepackage{booktabs}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  fig.align = "center",
+	cache = TRUE
+)
+
+```
+
+```{r packages, include=FALSE}
+
+# Packages to install ----
+## tree, rpart, rpart.plot, partykit, rattle, and randomForest
+#install.packages(
+ #  pkgs = c("tree", "rpart", "rpart.plot", "partykit", "rattle", "randomForest"))
+
+# Load packages used in this guide ----
+packages <- c("readr","dplyr","tidyverse", "knitr", "kableExtra","psych",
+              "janitor","tree", "rpart", "rpart.plot", "partykit",
+              "rattle", "randomForest", "yardstick","leaps",
+              "ggplot2","pROC","separationplot")
+
+
+invisible(
+  lapply( 
+    X = packages,
+    FUN = library,
+    character.only = TRUE,
+    quietly = TRUE
+  )
+)
+
+# Set the CRAN mirror
+options(repos = "https://cran.rstudio.com/")
+
+# Set Table Option ----
+options(knitr.kable.NA = "") 
+
+
+```
+
+
+```{r Loading data, echo=FALSE}
+heart <- read_csv("heart.csv")
+```
+
+
+# Background and Introduction
+Heart disease stands as a major public health challenge, not only because of its prevalence but also due to its profound impact on individuals and communities. My interest in this area stems from a broader concern for public health and the well-being of our society. The high incidence of heart disease, along with its potential to significantly impair quality of life, makes it a crucial area for study and intervention.
+
+In the realm of public health, the consequences of heart disease are far-reaching. It is one of the leading causes of death globally, affecting people of all ages and backgrounds. The burden it places on healthcare systems, families, and economies is substantial. This disease often leads to prolonged illness, disability, and a significant decrease in life expectancy. The ripple effects extend beyond the individual, affecting communities and societies at large.
+
+Understanding heart disease is not only about reducing mortality rates; it's about improving the quality of life and health outcomes for millions. This becomes even more pressing considering the risk factors associated with heart disease, such as hypertension, obesity, and diabetes, are becoming increasingly prevalent.
+
+This project is driven by the goal of applying machine learning techniques to gain a deeper understanding of heart disease. With a the dataset provided from the CDC, the study aims to identify key indicators and predictors of heart disease using analytical methods. The project involves employing various machine learning algorithms, each chosen for its ability to reveal different aspects of the data. Through regression-based, tree-based, and unsupervised learning approaches, the intention is to unearth patterns and correlations that might otherwise remain hidden. The insights gained from this study are expected to contribute to the development of more effective strategies for prevention, diagnosis, and management of heart disease, ultimately leading to better health outcomes.
+
+# Engaging with Heart Data set
+
+### Population and Data Collection
+The dataset used in this study originates from the Behavioral Risk Factor Surveillance System (BRFSS) conducted by the Centers for Disease Control and Prevention (CDC). Established in 1984, the BRFSS is a monumental public health survey system aimed at collecting crucial data on the health status and behaviors of residents in the United States. What started with 15 states has grown to encompass all 50 states, the District of Columbia, and three U.S. territories. The BRFSS conducts annual telephone surveys, consistently gathering data from over 400,000 adult interviews each year. This extensive and continuous data collection makes the BRFSS the largest and most comprehensive health survey system in the world.
+
+The dataset comprises data from a vast sample, with over 400,000 adult interviews conducted annually. This scale allows for a robust analysis of various factors related to heart disease.
+
+The BRFSS data collection process involves telephone surveys that inquire about various health-related topics. Respondents are asked questions about their health, lifestyle choices, and behaviors, providing valuable insights into the prevalence of health conditions and risk factors in the population. The dataset used for this project is the result of years of meticulous data collection, quality control, and analysis by the CDC, making it a reliable and invaluable resource for research in the field of public health.
+
+
+Data Selection:
+
+-  Demographic variables such as age, gender, and ethnicity were included to assess how heart disease risk varies among different population groups. Understanding these disparities is essential for tailoring interventions.
+
+-  Variables related to behavioral risk factors like smoking status, physical activity, and alcohol consumption were included as they are known contributors to heart disease. Analyzing these factors can shed light on modifiable aspects of heart disease risk.
+
+-  Clinical variables including blood pressure, cholesterol levels, and diabetes status were selected due to their direct impact on heart health. These are critical indicators for assessing an individual's risk of heart disease.
+
+The chosen variables are highly relevant in the context of heart disease. Heart disease is a multifactorial condition influenced by a combination of demographic, behavioral, and clinical factors. These variables allow us to explore the intricate relationships between different risk factors and the likelihood of developing heart disease.
+
+
+
+
+# Data Preprocessing
+
+# Study Design and Methods
+To investigate the factors influencing heart disease risk, we have designed an analytical study utilizing data from the CDC's Behavioral Risk Factor Surveillance System (BRFSS). This study aims to retrospectively analyze data collected from adult respondents who participated in the BRFSS survey, focusing on key variables related to heart disease.
+
+Data analysis involves employing a range of statistical and machine learning methods to explore the relationships between independent variables and the likelihood of heart disease. This includes logistic regression to model the binary response variable, random forest to capture complex interactions, and K-means clustering to identify subpopulations with similar risk profiles.
+
+
+# Data Exploration
+
+```{r}
+
+library(esquisse)
+### Use esquisse ----
+esquisse::esquisser(data = bechdel_awards, viewer = "browser")
+
+```
+# Regression Model
+## Runnning Algorithms
+## Assessing and Evaluating the Candidate Model
+# Decision Tree
+# Testing and Predicting
+# Clustering
+
+```{r}
+# Standardize the quantities in the penguin data ----
+cleanHeart <- heart %>%
+  mutate(
+    across(
+      .cols = where(is.numeric),
+      .fns = ~scale(.x)[,1],
+      .names = "{.col}_std"
+    )
+  )
+```
+
+```{r}
+# Deal with qualities ----
+cleanHeart <- cleanHeart %>%
+  mutate(
+    sex_coded = case_match(
+      Sex,
+      "F" ~ 1,
+      .default = 0
+    )
+  )
+```
+When considering qualitative attributes for clustering, I focused on the variables FastingBS, Heart Disease, and Sex. These factors seemed particularly fitting as they primarily consist of either/or questions, making it straightforward to convert their values into a binary format.
+
+```{r}
+# Make new data frame with just needed columns ----
+coreHeart <- cleanHeart %>%
+  dplyr::select(contains("_std"), sex_coded, FastingBS, HeartDisease)
+coreHeart <- coreHeart[, -which(names(coreHeart) == "HeartDisease_std")]
+coreHeart <- coreHeart[, -which(names(coreHeart) == "FastingBS_std")]
+```
+
+```{r}
+# Use dist to form the distance matrix for the penguin data ----
+
+distHeart <- dist(
+  x = coreHeart,
+  method = "euclidean"
+)
+```
+
+```{r}
+# Visualize the Heart distance matrix via a heat map ----
+library(factoextra)
+fviz_dist(
+  dist.obj = distHeart,
+  order = TRUE,
+  show_labels = FALSE
+)
+```
+A heat map is a data visualization technique that represents numerical values in a matrix as colors. It's an effective way to visualize complex data by using color gradients to represent different values. This heat map will represent the pairwise distances between samples in the heart dataset, potentially revealing patterns or clusters of similarity among the samples. 
+
+```{r}
+# Create scree plot for choosing k ----
+# library(factoextra)
+set.seed(380)
+fviz_nbclust(
+  x = coreHeart,
+  diss = NULL,
+  FUNcluster = kmeans,
+  method = "wss",
+  k.max = 10
+)
+```
+Generated a scree plot to identify the ideal number of clusters via the k-means algorithm applied to the coreHeart dataset. A scree plot serves as a visual aid in clustering analysis, illustrating how data variation is accounted for across various numbers of clusters (K values). Usually, the x-axis depicts the number of clusters (K), while the y-axis presents a metric assessing the quality of clustering.
+```{r}
+# k-means clustering of Heart ----
+set.seed(380)
+kmHeart <- kmeans(
+  x = distHeart,
+  centers = 3,
+  iter.max = 10,
+  nstart = 25
+)
+```
+
+```{r}
+# View k-means cluster results ----
+# library(factoextra)
+fviz_cluster(
+  object = kmHeart,
+  data = coreHeart,
+  stand = FALSE,
+  geom = "point",
+  main = "3-Means Cluster Plot"
+)
+```
+
+## Comparing the results
+## Discussion and Limitations
+
+
