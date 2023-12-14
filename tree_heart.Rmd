@@ -1,0 +1,500 @@
+---
+title: "Predicting Heart Disease"
+author: "Olachi Mbakwe, Justin Constant, Rebande Olusesi and Evan Settipane"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    latex_engine: xelatex
+    keep_tex: true
+geometry: left=1in,right=1in,top=1in,bottom=1in
+urlcolor: blue
+header-includes:
+  - \usepackage{subfig}
+  - \usepackage{float}
+  - \usepackage{booktabs}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  fig.align = "center",
+	cache = TRUE
+)
+
+```
+
+```{r packages, include=FALSE}
+
+# Packages to install ----
+## tree, rpart, rpart.plot, partykit, rattle, and randomForest
+#install.packages(
+ #  pkgs = c("tree", "rpart", "rpart.plot", "partykit", "rattle", "randomForest"))
+
+# Load packages used in this guide ----
+packages <- c("readr","dplyr","tidyverse", "knitr", "kableExtra","psych",
+              "janitor","tree", "rpart", "rpart.plot", "partykit",
+              "rattle", "randomForest", "yardstick","leaps",
+              "ggplot2","pROC","separationplot")
+
+
+invisible(
+  lapply( 
+    X = packages,
+    FUN = library,
+    character.only = TRUE,
+    quietly = TRUE
+  )
+)
+
+# Set the CRAN mirror
+options(repos = "https://cran.rstudio.com/")
+
+# Set Table Option ----
+options(knitr.kable.NA = "") 
+
+
+```
+
+```{r Loading data, echo=FALSE}
+heart_csv <- read_csv("heart.csv")
+```
+
+# Introduction
+
+# Engaging with Heart Data set
+
+# Study Design and Methods
+
+# Data Exploration
+
+# Regression Model
+
+## Running Algorithms
+
+## Assessing and Evaluating the Candidate Model
+
+# Decision Tree
+
+```{r train}
+# Replace 0s with "No Heart Disease" and 1s with "Heart Disease" in a specific column
+heart_csv$HeartDisease <- ifelse(heart_csv$HeartDisease == 0, "No Heart Disease", "Heart Disease")
+
+#Build Data sets for models
+modelData <-  heart_csv %>%
+  drop_na() %>%
+  mutate(
+    tempID = row_number(),
+    .before = HeartDisease
+  )
+
+#Set seed for reproducibility and slice
+set.seed(380)
+trainingData <- modelData %>%
+  group_by(HeartDisease) %>%
+  slice_sample(prop = 0.8)
+
+trainingResults <- trainingData
+
+testingData <- modelData
+```
+
+# Testing and Predicting
+
+```{r growrPart, fig.pos = "H"}
+# Grow tree via rpart package
+# library(rpart)
+rpartHeart1 <- rpart(
+  formula = HeartDisease ~ Sex + RestingBP + Cholesterol + ExerciseAngina + ChestPainType,
+  data = trainingData,
+  method = "class",
+  parms = list(split = "information"),
+  control = rpart.control()
+)
+```
+
+```{r rpartPlot, fig.pos = "H",echo=FALSE, message=FALSE}
+# Display rpart.plot
+# library(rpart.plot)
+rpart.plot(
+  x = rpartHeart1,
+  type = 2,
+  extra = 101
+)
+```
+
+```{r rpartTree, fig.pos = "H",echo=FALSE, message=FALSE}
+# Using the rattle package to visualize the tree
+fancyRpartPlot(
+  model = rpartHeart1,
+  main = NULL,
+  sub = NULL
+)
+```
+
+```{r elements}
+# Get table elements
+invisible(capture.output({cpTable <- printcp(rpartHeart1)}))
+```
+
+```{r cpTbl, fig.pos = "H", echo=FALSE, message=FALSE}
+# Create nice looking table of CP results
+kable(
+  x = cpTable,
+  col.names = c("CP", "Num. of splits", "Rel. Error",
+                "Mean Error", "Std. Deviation of Error"),
+  digits = 3,
+  booktabs = TRUE,
+  align = "c",
+  table.attr = 'data-quarto-disable-processing="true"'
+) %>%
+  kable_classic(
+    full_width = FALSE
+  ) %>%
+  kable_styling(latex_options = c("HOLD_position"))
+```
+
+```{r cpPlot, fig.pos = "H",echo=FALSE, message=FALSE}
+# Plot the CP results from rpart
+plotcp(
+  x = rpartHeart1,
+  minline = TRUE,
+  upper = "size"
+)
+```
+
+```{r prune}
+# Prune the rpart Tree
+rpartHeart2 <- prune(
+  tree = rpartHeart1,
+  cp = 0.011
+)
+```
+
+```{r predGrad}
+## The rpart package
+pred_heartRpart2 <- predict(
+  object = rpartHeart2,
+  newdata = testingData,
+  type = "prob"
+)
+```
+
+```{r wrangle}
+# Data Wrangling the predictions
+heartPredictions <- data.frame(
+  rpart2_heart = pred_heartRpart2[, 1],
+  rpart2_nonHeart = pred_heartRpart2[, 2]
+) %>%
+  mutate(
+    rpart2_pred = ifelse(
+      test = rpart2_heart > rpart2_nonHeart,
+      yes = "Heart Disease",
+      no = "No Heart Disease"
+    )
+  )
+```
+
+```{r predFac}
+## Set predictions as factors
+heartPredictions$rpart2_pred <- as.factor(heartPredictions$rpart2_pred)
+```
+
+```{r mergeColumn}
+# Merge supervision column into predictions data frame
+heartPredictions <- cbind(
+  HeartDisease = testingData$HeartDisease,
+  heartPredictions
+)
+```
+
+```{r matrixOne, fig.pos = "H", echo=FALSE, message=FALSE}
+heartPredictions$HeartDisease <- factor(heartPredictions$HeartDisease)
+# Build confusion matrix for second rpart model
+conf_mat(
+  data = heartPredictions,
+  truth = HeartDisease,
+  estimate = rpart2_pred
+)$table %>%
+  kable(
+    col.names = c("Heart Disease", "No Heart Disease"),
+  digits = 3,
+  booktabs = TRUE,
+  align = "c",
+  table.attr = 'data-quarto-disable-processing="true"'
+  ) %>%
+  kable_classic(
+    full_width = FALSE
+  )%>%
+  kable_styling(latex_options = c("HOLD_position"))
+```
+
+```{r accSensSpec}
+# Build a data frame with model metrics
+heartPreds <- heartPredictions %>%
+  dplyr::select(HeartDisease, contains("_pred")) %>%
+  pivot_longer(
+    cols = !c(HeartDisease),
+    names_to = "model",
+    values_to = "prediction"
+  )
+
+accuracy <- heartPreds %>%
+  group_by(model) %>%
+  accuracy(
+    truth = HeartDisease,
+    estimate = prediction
+  )
+
+sensitivity <- heartPreds %>%
+  group_by(model) %>%
+  sensitivity(
+    truth = HeartDisease,
+    estimate = prediction,
+    event_level = "second"
+  )
+
+specificity <- heartPreds %>%
+  group_by(model) %>%
+  specificity(
+    truth = HeartDisease,
+    estimate = prediction,
+    event_level = "second"
+  )
+
+modelMetrics <- bind_rows(
+  accuracy,
+  sensitivity,
+  specificity
+)
+```
+
+```{r modelMet, fig.pos = "H", echo=FALSE, message=FALSE}
+# Make a nice looking table of model metrics
+modelMetrics %>%
+  dplyr::select(model, .metric, .estimate) %>%
+  pivot_wider(
+    id_cols = model,
+    names_from = .metric,
+    values_from = .estimate
+  ) %>%
+  kable(
+    digits = 3,
+    booktabs = TRUE,
+    align = "c",
+    table.attr = 'data-quarto-disable-processing="true"'
+  ) %>%
+  kable_classic(
+    full_width = FALSE
+  )%>%
+  kable_styling(latex_options = c("HOLD_position"))
+```
+
+```{r randFor}
+# Using randomForest to use an ensemble method
+# library(randomForest)
+trainingData$HeartDisease <- as.factor(trainingData$HeartDisease)
+heartForest1 <- randomForest(
+  formula = HeartDisease ~ Age + Sex + RestingBP + Cholesterol + ExerciseAngina + ChestPainType,
+  data = trainingData,
+  ntree = 1000,
+  mtry = 3,
+  importance = TRUE,
+  do.trace = FALSE, 
+  keep.forest = TRUE
+)
+```
+
+```{r plotOne, fig.pos = "H",echo=FALSE, message=FALSE}
+# Create a line plot of OOB Error and Misclassification Rates
+as.data.frame(heartForest1$err.rate) %>%
+  mutate(
+    Tree = row_number(),
+    .before = OOB
+  ) %>%
+  pivot_longer(
+    cols = !Tree,
+    names_to = "Type",
+    values_to = "Error"
+  ) %>%
+  ggplot(
+    mapping = aes(
+      x = Tree,
+      y = Error,
+      color = Type,
+      linetype = Type
+    )
+) +
+  geom_path() +
+  theme_bw() +
+  scale_linetype_manual(values = c("dashed", "dotted", "solid"))
+```
+
+```{r importance, fig.pos = "H", echo=FALSE, message=FALSE}
+# Display attribute importance in a table
+importance(heartForest1) %>%
+  kable(
+    digits = 3,
+    booktabs = TRUE,
+    align = "c",
+    table.attr = 'data-quarto-disable-processing="true"'
+  ) %>%
+  kable_classic(
+    full_width = FALSE
+  )%>%
+  kable_styling(latex_options = c("HOLD_position"))
+```
+
+```{r plotImp, fig.pos = "H",echo=FALSE, message=FALSE}
+# Attribute Importance Plots
+
+varImpPlot(
+  x = heartForest1,
+  main = "Classifying Graduated/Not Graduated Students"
+)
+
+# Predict new observations
+testingResults1 <- testingData
+testingResults1$predicted <- predict(
+  object = heartForest1,
+  newdata = testingData,
+  type = "response"
+)
+```
+
+```{r matrixTwo, fig_pos = "H", echo=FALSE, message=FALSE}
+testingResults1$HeartDisease <- factor(testingResults1$HeartDisease)
+# Build Confusion Matrix
+conf_mat(
+  data = testingResults1,
+  truth = HeartDisease,
+  estimate = predicted
+)$table %>%
+  kable(
+    col.names = c("Prediction/Supervision", "Heart Disease", "No Heart Disease"),
+    digits = 3,
+    booktabs = TRUE,
+    align = "c",
+    table.attr = 'data-quarto-disable-processing="true"'
+  ) %>%
+  kable_classic(
+    full_width = FALSE
+  )%>%
+  kable_styling(latex_options = c("HOLD_position"))
+```
+
+```{r accSensSpec}
+# Build a data frame with model metrics
+heartTest <- testingResults1 %>%
+  dplyr::select(HeartDisease, contains("predicted")) %>%
+  pivot_longer(
+    cols = !c(HeartDisease),
+    names_to = "model",
+    values_to = "prediction"
+  )
+
+accuracy <- heartTest %>%
+  group_by(model) %>%
+  accuracy(
+    truth = HeartDisease,
+    estimate = prediction
+  )
+
+sensitivity <- heartTest %>%
+  group_by(model) %>%
+  sensitivity(
+    truth = HeartDisease,
+    estimate = prediction,
+    event_level = "second"
+  )
+
+specificity <- heartTest %>%
+  group_by(model) %>%
+  specificity(
+    truth = HeartDisease,
+    estimate = prediction,
+    event_level = "second"
+  )
+
+modelMetrics <- bind_rows(
+  accuracy,
+  sensitivity,
+  specificity
+)
+```
+
+```{r modelMet, fig.pos = "H", echo=FALSE, message=FALSE}
+# Make a nice looking table of model metrics
+modelMetrics %>%
+  dplyr::select(model, .metric, .estimate) %>%
+  pivot_wider(
+    id_cols = model,
+    names_from = .metric,
+    values_from = .estimate
+  ) %>%
+  kable(
+    digits = 3,
+    booktabs = TRUE,
+    align = "c",
+    table.attr = 'data-quarto-disable-processing="true"'
+  ) %>%
+  kable_classic(
+    full_width = FALSE
+  )%>%
+  kable_styling(latex_options = c("HOLD_position"))
+```
+
+```{r change}
+testingData <- as.data.frame(testingData)
+```
+
+```{r grad3}
+library(dplyr)
+testingData$HeartDisease <- factor(testingData$HeartDisease)
+# Using randomForest to do training and testing
+heartForest3 <- randomForest(
+  x = trainingData[, which(!(names(trainingData) %in% c("tempID", "HeartDisease")))],
+  y = trainingData$HeartDisease,
+  xtest <- testingData[, which(!(names(testingData) %in% c("tempID", "HeartDisease")))],
+  ytest = testingData$HeartDisease,
+  ntree = 1000, 
+  mtry = 3,
+  importance = TRUE,
+  do.trace = FALSE,
+  keep.forest = TRUE
+)
+```
+
+```{r oobTestError, fig.pos = "H",echo=FALSE, message=FALSE}
+# Plot of OOB and Testing Set Errors
+bind_cols(
+  oob = as.data.frame(heartForest3$err.rate)$OOB,
+  test = as.data.frame(heartForest3$test$err.rate)$Test
+) %>%
+  mutate(
+    tree = row_number(),
+    .before = oob
+  ) %>%
+  pivot_longer(
+    cols = !tree,
+    names_to = "Source",
+    values_to = "Error"
+  ) %>%
+  ggplot(
+    mapping = aes(
+      x = tree,
+      y = Error,
+      color = Source,
+      linetype = Source
+    )
+  ) +
+  geom_path() +
+  theme_bw()
+```
+
+# Clustering
+
+## Comparing the results
+
+## Discussion and Limitations
