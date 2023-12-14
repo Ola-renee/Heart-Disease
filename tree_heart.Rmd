@@ -58,7 +58,7 @@ options(knitr.kable.NA = "")
 ```
 
 ```{r Loading data, echo=FALSE}
-heart_csv <- read_csv("heart.csv")
+heart_csvEvan <- read_csv("heart.csv")
 ```
 
 # Introduction
@@ -77,12 +77,14 @@ heart_csv <- read_csv("heart.csv")
 
 # Decision Tree
 
+Within this area of the project, because of our data set not being the biggest thing ever, we are more prone of over fitting using decision trees.
+
 ```{r train}
 # Replace 0s with "No Heart Disease" and 1s with "Heart Disease" in a specific column
-heart_csv$HeartDisease <- ifelse(heart_csv$HeartDisease == 0, "No Heart Disease", "Heart Disease")
+heart_csvEvan$HeartDisease <- ifelse(heart_csvEvan$HeartDisease == 0, "No Heart Disease", "Heart Disease")
 
 #Build Data sets for models
-modelData <-  heart_csv %>%
+modelDataEvan <-  heart_csvEvan %>%
   drop_na() %>%
   mutate(
     tempID = row_number(),
@@ -91,13 +93,13 @@ modelData <-  heart_csv %>%
 
 #Set seed for reproducibility and slice
 set.seed(380)
-trainingData <- modelData %>%
+trainingDataEvan <- modelDataEvan %>%
   group_by(HeartDisease) %>%
   slice_sample(prop = 0.8)
 
-trainingResults <- trainingData
+trainingResultsEvan <- trainingDataEvan
 
-testingData <- modelData
+testingDataEvan <- modelDataEvan
 ```
 
 # Testing and Predicting
@@ -107,7 +109,7 @@ testingData <- modelData
 # library(rpart)
 rpartHeart1 <- rpart(
   formula = HeartDisease ~ Sex + RestingBP + Cholesterol + ExerciseAngina + ChestPainType,
-  data = trainingData,
+  data = trainingDataEvan,
   method = "class",
   parms = list(split = "information"),
   control = rpart.control()
@@ -123,6 +125,10 @@ rpart.plot(
   extra = 101
 )
 ```
+
+Above is now a plot for our first rPart tree. This tree gives us insight in some good statistics about its decision making based on if a person has heart disease or not. Within each node we see two separate number's and a percentage's. We also see either "Heart Disease" or "No Heart Disease" and a color that is filled within the node. I will first start with explaining the percentage and the numbers in the nodes. The numbers are representing either a person with or without heart disease, and the percentages are representing the total number of people in that node compared to the whole data set. So if we were to look at the node with 46% in it (top right), we now know that this node has 46% of the people in the data set.
+
+####Now for this plot to make a little more sense I will need to explain the color of the nodes and what numbers in them represent Graduated and what represent Not Graduated. Now again, looking at the 90% node we see that it is Graduated with a blue fill, and every other node with Graduated has a blue fill. This could only mean that the blue fill represents Graduated students and the green fill represents Not Graduated students. Now knowing this, we can assume that the numbers on the left in the nodes are Graduated students and the numbers on the right are Not Graduated students. The last thing we can see in this plot is that the colored fills are darker or lighter. Lets look at the two nodes on the bottom right, with 6% and 10%. When looking at the 6% node, we can see that the fill is a much lighter color than the 10% node, and while looking at the number distribution in them we can see that the 6% node is much closer to each other than the 10% node. Now with this information we can assume that the lighter the color, the less distribution there is between Not Graduated and Graduated students, while more distribution makes the fill darker.
 
 ```{r rpartTree, fig.pos = "H",echo=FALSE, message=FALSE}
 # Using the rattle package to visualize the tree
@@ -176,14 +182,14 @@ rpartHeart2 <- prune(
 ## The rpart package
 pred_heartRpart2 <- predict(
   object = rpartHeart2,
-  newdata = testingData,
+  newdata = testingDataEvan,
   type = "prob"
 )
 ```
 
 ```{r wrangle}
 # Data Wrangling the predictions
-heartPredictions <- data.frame(
+heartPredictionsEvan <- data.frame(
   rpart2_heart = pred_heartRpart2[, 1],
   rpart2_nonHeart = pred_heartRpart2[, 2]
 ) %>%
@@ -198,22 +204,22 @@ heartPredictions <- data.frame(
 
 ```{r predFac}
 ## Set predictions as factors
-heartPredictions$rpart2_pred <- as.factor(heartPredictions$rpart2_pred)
+heartPredictionsEvan$rpart2_pred <- as.factor(heartPredictionsEvan$rpart2_pred)
 ```
 
 ```{r mergeColumn}
 # Merge supervision column into predictions data frame
-heartPredictions <- cbind(
-  HeartDisease = testingData$HeartDisease,
-  heartPredictions
+heartPredictionsEvan <- cbind(
+  HeartDisease = testingDataEvan$HeartDisease,
+  heartPredictionsEvan
 )
 ```
 
 ```{r matrixOne, fig.pos = "H", echo=FALSE, message=FALSE}
-heartPredictions$HeartDisease <- factor(heartPredictions$HeartDisease)
+heartPredictionsEvan$HeartDisease <- factor(heartPredictionsEvan$HeartDisease)
 # Build confusion matrix for second rpart model
 conf_mat(
-  data = heartPredictions,
+  data = heartPredictionsEvan,
   truth = HeartDisease,
   estimate = rpart2_pred
 )$table %>%
@@ -232,7 +238,7 @@ conf_mat(
 
 ```{r accSensSpec}
 # Build a data frame with model metrics
-heartPreds <- heartPredictions %>%
+heartPredsEvan <- heartPredictionsEvan %>%
   dplyr::select(HeartDisease, contains("_pred")) %>%
   pivot_longer(
     cols = !c(HeartDisease),
@@ -240,14 +246,14 @@ heartPreds <- heartPredictions %>%
     values_to = "prediction"
   )
 
-accuracy <- heartPreds %>%
+accuracy <- heartPredsEvan %>%
   group_by(model) %>%
   accuracy(
     truth = HeartDisease,
     estimate = prediction
   )
 
-sensitivity <- heartPreds %>%
+sensitivity <- heartPredsEvan %>%
   group_by(model) %>%
   sensitivity(
     truth = HeartDisease,
@@ -255,7 +261,7 @@ sensitivity <- heartPreds %>%
     event_level = "second"
   )
 
-specificity <- heartPreds %>%
+specificity <- heartPredsEvan %>%
   group_by(model) %>%
   specificity(
     truth = HeartDisease,
@@ -263,7 +269,7 @@ specificity <- heartPreds %>%
     event_level = "second"
   )
 
-modelMetrics <- bind_rows(
+modelMetricsEvan <- bind_rows(
   accuracy,
   sensitivity,
   specificity
@@ -272,7 +278,7 @@ modelMetrics <- bind_rows(
 
 ```{r modelMet, fig.pos = "H", echo=FALSE, message=FALSE}
 # Make a nice looking table of model metrics
-modelMetrics %>%
+modelMetricsEvan %>%
   dplyr::select(model, .metric, .estimate) %>%
   pivot_wider(
     id_cols = model,
@@ -294,10 +300,10 @@ modelMetrics %>%
 ```{r randFor}
 # Using randomForest to use an ensemble method
 # library(randomForest)
-trainingData$HeartDisease <- as.factor(trainingData$HeartDisease)
+trainingDataEvan$HeartDisease <- as.factor(trainingDataEvan$HeartDisease)
 heartForest1 <- randomForest(
   formula = HeartDisease ~ Age + Sex + RestingBP + Cholesterol + ExerciseAngina + ChestPainType,
-  data = trainingData,
+  data = trainingDataEvan,
   ntree = 1000,
   mtry = 3,
   importance = TRUE,
@@ -355,19 +361,19 @@ varImpPlot(
 )
 
 # Predict new observations
-testingResults1 <- testingData
-testingResults1$predicted <- predict(
+testingResultsEvan <- testingDataEvan
+testingResultsEvan$predicted <- predict(
   object = heartForest1,
-  newdata = testingData,
+  newdata = testingDataEvan,
   type = "response"
 )
 ```
 
 ```{r matrixTwo, fig_pos = "H", echo=FALSE, message=FALSE}
-testingResults1$HeartDisease <- factor(testingResults1$HeartDisease)
+testingResultsEvan$HeartDisease <- factor(testingResultsEvan$HeartDisease)
 # Build Confusion Matrix
 conf_mat(
-  data = testingResults1,
+  data = testingResultsEvan,
   truth = HeartDisease,
   estimate = predicted
 )$table %>%
@@ -386,7 +392,7 @@ conf_mat(
 
 ```{r accSensSpec}
 # Build a data frame with model metrics
-heartTest <- testingResults1 %>%
+heartTest <- testingResultsEvan %>%
   dplyr::select(HeartDisease, contains("predicted")) %>%
   pivot_longer(
     cols = !c(HeartDisease),
@@ -417,7 +423,7 @@ specificity <- heartTest %>%
     event_level = "second"
   )
 
-modelMetrics <- bind_rows(
+modelMetricsEvan <- bind_rows(
   accuracy,
   sensitivity,
   specificity
@@ -426,7 +432,7 @@ modelMetrics <- bind_rows(
 
 ```{r modelMet, fig.pos = "H", echo=FALSE, message=FALSE}
 # Make a nice looking table of model metrics
-modelMetrics %>%
+modelMetricsEvan %>%
   dplyr::select(model, .metric, .estimate) %>%
   pivot_wider(
     id_cols = model,
@@ -446,18 +452,18 @@ modelMetrics %>%
 ```
 
 ```{r change}
-testingData <- as.data.frame(testingData)
+testingDataEvan <- as.data.frame(testingDataEvan)
 ```
 
 ```{r grad3}
 library(dplyr)
-testingData$HeartDisease <- factor(testingData$HeartDisease)
+testingDataEvan$HeartDisease <- factor(testingDataEvan$HeartDisease)
 # Using randomForest to do training and testing
 heartForest3 <- randomForest(
-  x = trainingData[, which(!(names(trainingData) %in% c("tempID", "HeartDisease")))],
-  y = trainingData$HeartDisease,
-  xtest <- testingData[, which(!(names(testingData) %in% c("tempID", "HeartDisease")))],
-  ytest = testingData$HeartDisease,
+  x = trainingDataEvan[, which(!(names(trainingDataEvan) %in% c("tempID", "HeartDisease")))],
+  y = trainingDataEvan$HeartDisease,
+  xtest <- testingDataEvan[, which(!(names(testingDataEvan) %in% c("tempID", "HeartDisease")))],
+  ytest = testingDataEvan$HeartDisease,
   ntree = 1000, 
   mtry = 3,
   importance = TRUE,
