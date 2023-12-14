@@ -1,0 +1,564 @@
+---
+title: "Predicting Heart Diesea"
+author: "Olachi Mbakwe, Justin Constant, Rebande Olusesi and Evan Settipane"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    latex_engine: xelatex
+    keep_tex: true
+geometry: left=1in,right=1in,top=1in,bottom=1in
+urlcolor: blue
+header-includes:
+  - \usepackage{subfig}
+  - \usepackage{float}
+  - \usepackage{booktabs}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  fig.align = "center",
+	cache = TRUE
+)
+
+```
+
+```{r packages, include=FALSE}
+
+# Packages to install ----
+## tree, rpart, rpart.plot, partykit, rattle, and randomForest
+#install.packages(
+ #  pkgs = c("tree", "rpart", "rpart.plot", "partykit", "rattle", "randomForest"))
+
+# Load packages used in this guide ----
+packages <- c("readr","dplyr","tidyverse", "knitr", "kableExtra","psych",
+              "janitor","tree", "rpart", "rpart.plot", "partykit",
+              "rattle", "randomForest", "yardstick","leaps",
+              "ggplot2","pROC","separationplot")
+
+
+invisible(
+  lapply( 
+    X = packages,
+    FUN = library,
+    character.only = TRUE,
+    quietly = TRUE
+  )
+)
+
+# Set the CRAN mirror
+options(repos = "https://cran.rstudio.com/")
+
+# Set Table Option ----
+options(knitr.kable.NA = "") 
+
+
+```
+
+
+```{r Loading data, echo=FALSE}
+heart <- read_csv("C:/Users/Owner/Downloads/archive (2)/heart.csv")
+```
+
+
+# Background and Introduction
+Heart disease stands as a major public health challenge, not only because of its prevalence but also due to its profound impact on individuals and communities. Our interest in this area stems from a broader concern for public health and the well-being of our society. The high incidence of heart disease, along with its potential to significantly impair quality of life, makes it a crucial area for study and intervention.
+
+In the realm of public health, the consequences of heart disease are far-reaching. It is one of the leading causes of death globally, affecting people of all ages and backgrounds. The burden it places on healthcare systems, families, and economies is substantial. This disease often leads to prolonged illness, disability, and a significant decrease in life expectancy. The ripple effects extend beyond the individual, affecting communities and societies at large.
+
+Understanding heart disease is not only about reducing mortality rates; it's about improving the quality of life and health outcomes for millions. This becomes even more pressing considering the risk factors associated with heart disease, such as hypertension, obesity, and diabetes, are becoming increasingly prevalent.
+
+This project is driven by applying machine learning techniques to gain a deeper understanding of heart disease. With a the dataset provided from the CDC, the study aims to identify key indicators and predictors of heart disease using analytical methods. The project involves employing various machine learning algorithms, each chosen for its ability to reveal different aspects of the data. Through regression-based, tree-based, and unsupervised learning approaches, the intention is to unearth patterns and correlations that might otherwise remain hidden. The insights gained from this study are expected to contribute to the development of more effective strategies for prevention, diagnosis, and management of heart disease, ultimately leading to better health outcomes.
+
+# Engaging with Heart Data set
+
+### Population and Data Collection
+The dataset used in this study originates from the Behavioral Risk Factor Surveillance System (BRFSS) conducted by the Centers for Disease Control and Prevention (CDC). Established in 1984, the BRFSS is a monumental public health survey system aimed at collecting crucial data on the health status and behaviors of residents in the United States. What started with 15 states has grown to encompass all 50 states, the District of Columbia, and three U.S. territories. The BRFSS conducts annual telephone surveys, consistently gathering data from over 400,000 adult interviews each year. This extensive and continuous data collection makes the BRFSS the largest and most comprehensive health survey system in the world.
+
+The dataset comprises data from a vast sample, with over 400,000 adult interviews conducted annually. This scale allows for a robust analysis of various factors related to heart disease.
+
+The BRFSS data collection process involves telephone surveys that inquire about various health-related topics. Respondents are asked questions about their health, lifestyle choices, and behaviors, providing valuable insights into the prevalence of health conditions and risk factors in the population. The dataset used for this project is the result of years of meticulous data collection, quality control, and analysis by the CDC, making it a reliable and invaluable resource for research in the field of public health.
+
+
+Data Selection:
+
+-  Demographic variables such as age, gender, and ethnicity were included to assess how heart disease risk varies among different population groups. Understanding these disparities is essential.
+
+-  Variables related to behavioral risk factors like smoking status, physical activity, and alcohol consumption were included as they are known contributors to heart disease.
+
+-  Clinical variables including blood pressure, cholesterol levels, and diabetes status were selected due to their direct impact on heart health. These are critical indicators for assessing an individual's risk of heart disease.
+
+The chosen variables are very relevant in the context of heart disease. Heart disease is a multifactorial condition influenced by a combination of demographic, behavioral, and clinical factors. These variables allow us to explore the  relationships between different risk factors and the likelihood of developing heart disease.
+
+
+# Data Preprocessing
+
+# Study Design and Methods
+To investigate the factors influencing heart disease risk, we have designed an analytical study utilizing data from the CDC's Behavioral Risk Factor Surveillance System (BRFSS). This study aims to retrospectively analyze data collected from adult respondents who participated in the BRFSS survey, focusing on key variables related to heart disease.
+
+Data analysis involves employing a range of statistical and machine learning methods to explore the relationships between independent variables and the likelihood of heart disease. This includes logistic regression to model the binary response variable, random forest to capture complex interactions, and K-means clustering to identify subpopulations with similar risk profiles.
+
+
+# Data Exploration
+
+```{r}
+heart 
+```
+
+# Regression Model
+
+## Logistic Regression
+
+
+### Methodology 
+
+
+Given that our goal is to build a classifier that will predict whether a person is going to have heart disease or not (binary), logistic regression provides an excellent algorithm to build our classifier. To provide model validation evidence, we will use an 80% training–20% testing split based upon stratified random sampling. We will do this after removing any cases with missing information.
+
+We will then build two candidate models. The first model will use a single predictor oldpeak based upon prior research. The second candidate model will emerge from a step wise feature selection search pegged to the Akaike Information Criterion (AIC). We will evaluate both of these models and refine them to a final model. We will assess this final model on our testing data.
+
+```{r}
+modelData <- heart %>%
+  drop_na() %>%
+  mutate(
+    tempID = row_number(),
+    .before = Age
+  )
+
+set.seed(380)
+trainingData <- modelData %>%
+  slice_sample(prop = 0.8)
+
+trainingResults <- trainingData
+
+testingData <- modelData %>%
+  filter(!(tempID %in% trainingData$tempID))
+
+# Form Candidate Model 1 ----
+logmodel1 <- glm(
+  formula = HeartDisease ~ Oldpeak ,
+  data = trainingData,
+  family = binomial
+)
+
+# Form Candidate Model 2 ----
+## Lower bound
+### Intercept only
+lower <- glm(
+  formula = HeartDisease ~ 1,
+  data = trainingData,
+  family = binomial
+)
+## Upper bound
+
+upper <- glm(
+  formula = HeartDisease ~  Age + Sex + ChestPainType + RestingBP + Cholesterol + FastingBS + RestingECG + MaxHR + ExerciseAngina + Oldpeak + ST_Slope,
+  data = trainingData,
+  family = binomial
+)
+
+## Stepwise search
+model2 <- step(
+  object = lower,
+  scope = list(
+    lower = lower,
+    upper = upper
+  ),
+  data = trainingData,
+  direction = "both",
+  k = 2,
+  trace = 0
+)
+```
+
+### Results
+
+We will present our results in three parts. First, we’ll discuss the two initial models, separately. Then we’ll compare the two models and discuss how we refined the models before testing out the refined model with our testing data. For any hypothesis testing and confidence interval construction, we’ll control our overall Type I error rate at 7%. For any confusion matrices, we will draw upon a naïve rule where any predicted probability of a person having heart disease greater than 0.5 will classify the person as having heart disease.
+
+#### model 1
+
+```{r}
+# Model 1 Coefficient Table ----
+as.data.frame(summary(logmodel1)$coefficients) %>%
+  rownames_to_column(var = "term") %>%
+  rename(coefficient = Estimate) %>% 
+  mutate(
+    prob_odds = case_when(
+      coefficient == "(Intercept)" ~ exp(coefficient)/(1 + exp(coefficient)),
+      .default = exp(coefficient)
+    ),
+    .after = coefficient
+  ) %>%
+  mutate(
+    `Pr(>|z|)` = ifelse(
+      test = `Pr(>|z|)` < 0.001,
+      yes = paste("< 0.001"),
+      no = `Pr(>|z|)`
+    )
+  ) %>%
+  kable(
+    digits = 3,
+    booktabs = TRUE,
+    align = c("l", rep("c", 5)),
+    col.names = c("Term", "Coefficient", "Prob./Odds Ratio",
+                  "Std. Err.", "Z", "p-value"),
+    table.attr = 'data-quarto-disable-processing="true"'
+  ) %>%
+  kable_classic(
+    position = "center",
+    bootstrap_options = "condensed",
+    latex_options = c("HOLD_position"),
+    full_width = FALSE
+  )
+```
+
+
+The analysis involves a logistic regression model for heart disease, specifically focusing on the Oldpeak predictor. The intercept term's coefficient is -0.574, with a corresponding probability of 0.563 and a standard error of 0.105. This implies that when Oldpeak is near 1, the probability of not having heart disease is essentially 0. The coefficient for Oldpeak is 1.036, associated with a probability or odds ratio of 2.819 and a standard error of 0.100. The change in the log-odds for heart disease increases by a factor of 1.036 for each unit increase in Oldpeak. The statistical significance is evident, as the p-value for both the intercept and Oldpeak is less than 0.001. The model also includes a Z-score of -5.462 for the intercept and 10.389 for Oldpeak, further reinforcing their significance in predicting heart disease.
+
+
+
+```{r}
+
+# Building confidence intervals for Model 1 coefficients ----
+model1CI <- confint(
+  object = logmodel1,
+  parm = "Oldpeak",
+  level = 0.9
+)
+# Stored fitted values for Model 1 ----
+trainingResults$model1Pred <- predict(
+  object = logmodel1,
+  newdata = trainingData,
+  type = "response"
+)
+
+# Apply naïve rule ----
+trainingResults <- trainingResults %>%
+  mutate(
+    model1Class = case_when(
+      model1Pred > 0.5 ~ "1",
+      .default = "0"
+    )
+  )
+
+# Build Confusion Matrix for Model 1 ----
+trainingResults %>%
+  tabyl(var1 = model1Class, var2 = HeartDisease) %>%
+  adorn_title(
+    placement = "combined",
+    row_name = "Predicted",
+    col_name = "Actual"
+  ) %>%
+  kable(
+    booktabs = TRUE,
+    align = "c",
+    table.attr = 'data-quarto-disable-processing="true"'
+  ) %>%
+  kable_classic(
+    position = "center",
+    bootstrap_options = "condensed",
+    latex_options = c("HOLD_position"),
+    full_width = FALSE
+  )
+
+```
+** Note** 0 is the case of a normal patient and 1 is the case of a patient with heart disease  
+
+
+This model’s accuracy is approximately 71% , with a sensitivity of  69% and a specificity of 73% . While Model 1 is better than a fair coin, this model is not far from the fair coin under our naïve rule and could be a lot better.
+
+#Coeffient table
+
+```{r}
+x <- as.data.frame(summary(model2)$coefficients) %>%
+ rownames_to_column(var = "term") %>%
+  rename(coefficient = Estimate) %>% 
+  mutate(
+    prob_odds = case_when(
+      coefficient == "(Intercept)" ~ exp(coefficient)/(1 + exp(coefficient)),
+      .default = exp(coefficient)
+    ),
+    .after = coefficient
+  ) %>%
+  mutate(
+    `Pr(>|z|)` = ifelse(
+      test = `Pr(>|z|)` < 0.001,
+      yes = paste("< 0.001"),
+      no = round(`Pr(>|z|)`, 3)
+    ))
+
+  kable(x,
+    digits = 3,
+    booktabs = TRUE,
+    align = c("l", rep("c", 5)),
+    col.names = c("Term", "Coefficient", "Prob./Odds Ratio",
+                  "Std. Err.", "Z", "p-value"),
+    table.attr = 'data-quarto-disable-processing="true"'
+  ) %>%
+  kable_classic(
+    position = "center",
+    bootstrap_options = "condensed",
+    latex_options = c("HOLD_position"),
+    full_width = FALSE
+  )
+```
+
+
+```{r}
+# Build Tukey-Anscombe plot for Model 2 ----
+ggplot(
+  data = data.frame(
+    residuals = residuals(model2, type = "pearson"),
+    fitted = fitted(model2)
+  ),
+  mapping = aes(x = fitted, y = residuals)
+) +
+  geom_point() +
+  geom_smooth(
+    formula = y ~ x,
+    method = stats::loess,
+    method.args = list(degree = 1),
+    se = FALSE,
+    linewidth = 0.5
+  ) +
+  theme_bw() +
+  labs(
+    x = "Fitted",
+    y = "Pearson Residuals"
+  ) 
+
+```
+
+
+Above shows the Tukey-Anscombe plot using Pearson residuals for Model 2. We can see the classical pattern for logistic regression in the plot; the smoothing line does indicate that residuals are centered around zero. 
+
+
+
+```{r}
+# Find GVIF for Model 2 and build a table ----
+as.data.frame(car::vif(model2)) %>%
+  rownames_to_column(var = "term") %>%
+  mutate( squared = `GVIF^(1/(2*Df))`^2) %>%
+  kable(
+    digits = 3,
+    align = "lcccc",
+    booktab = TRUE,
+    format.args = list(big.mark = ","),
+    table.attr = 'data-quarto-disable-processing="true"'
+  ) %>%
+  kable_classic(
+    position = "center",
+    bootstrap_options = "condensed",
+    latex_options = c("HOLD_position"),
+    full_width = FALSE
+  )
+```
+The table above shows the generalized variance inflation factors for candidate Model 2. We need to be a bit cautious when examining these values as the current calculations do not adequate account for the higher order interactions. None of the GIVF's are inflated so this points to model 2 being a good model. 
+
+
+```{r}
+# Stored fitted values for Model 2 ----
+trainingResults$model2Pred <- predict(
+  object = model2,
+  newdata = trainingData,
+  type = "response"
+)
+
+# Apply naïve rule ----
+trainingResults <- trainingResults %>%
+  mutate(
+    model2Class = case_when(
+      model2Pred > 0.5 ~ "1",
+      .default = "0"
+    )
+  )
+
+# Build Confusion Matrix for Model 2 ----
+trainingResults %>%
+  tabyl(var1 = model2Class, var2 = HeartDisease) %>%
+  adorn_title(
+    placement = "combined",
+    row_name = "Predicted",
+    col_name = "Actual"
+  ) %>%
+  kable(
+    booktabs = TRUE,
+    align = "c",
+    table.attr = 'data-quarto-disable-processing="true"'
+  ) %>%
+  kable_classic(
+    position = "center",
+    bootstrap_options = "condensed",
+    latex_options = c("HOLD_position"),
+    full_width = FALSE
+  )
+```
+
+**Note** 0 is the case of a normal patient and 1 is the case of a patient with heart disease  
+
+This model’s accuracy is approximately 89%, with a sensitivity of  85% and a specificity of 91% . Model 2 is  a lot better than a fair coin. 
+
+### Model Comparison
+
+```{r}
+# Fit ROC Curves ----
+## Model 1
+model1ROC <- roc(
+  formula = HeartDisease ~ model1Pred,
+  data = trainingResults
+)
+model1ROC_df <- data.frame(
+  threshold = model1ROC$thresholds,
+  sensitivity = model1ROC$sensitivities,
+  specificity = model1ROC$specificities,
+  model = "Model 1"
+)
+
+## Model 2
+model2ROC <- roc(
+  formula = HeartDisease ~ model2Pred,
+  data = trainingResults
+)
+model2ROC_df <- data.frame(
+  threshold = model2ROC$thresholds,
+  sensitivity = model2ROC$sensitivities,
+  specificity = model2ROC$specificities,
+  model = "Model 2"
+)
+
+## Merge into one data frame
+rocData <- rbind(model1ROC_df, model2ROC_df)
+
+## AUC Data
+aucData <- data.frame(
+  model = c("Model 1", "Model 2"),
+  auc = c(model1ROC$auc, model2ROC$auc)
+)
+
+# Make ROC Plot ----
+ggplot(
+  data = rocData,
+  mapping = aes(x = 1 - specificity, y = sensitivity, color = model)
+) +
+  geom_path() +
+  geom_abline(
+    slope = 1,
+    intercept = 0,
+    linetype = "dotted"
+  ) +
+  geom_text(
+    inherit.aes = FALSE,
+    data = aucData,
+    mapping = aes(label = paste(model, "AUC: \n", round(auc, 3))),
+    x = c(0.25, 0.25),
+    y = c(0.4, 0.9)
+  ) +
+  theme_bw() +
+  coord_fixed()
+
+```
+
+As the confusion matrices highlight, our two models are quite different from one another, with the multiple logistic regression model (i.e., Model 2) doing far better. The figure above shows the ROC curves and AUC values for our two initial models. As anticipated, the second candidate model (the blue curve) does much better than the first model (the red curve).
+
+```{r}
+par(mfrow = c(1, 2), mar = c(4,0,4,0))
+## Model 1
+separationplot(
+  pred = trainingResults$model1Pred, 
+  actual = trainingResults$HeartDisease, 
+  type = "line", 
+  line = TRUE,
+  col0 = "#eabcc9",
+  col1 = "#a5b2ca",
+  show.expected = TRUE, 
+  heading = "Model 1",
+  newplot = FALSE
+)
+
+## Model 2
+separationplot(
+  pred = trainingResults$model2Pred, 
+  actual = trainingResults$HeartDisease, 
+  type = "line", 
+  line = TRUE,
+  col0 = "#eabcc9",
+  col1 = "#a5b2ca",
+  show.expected = TRUE, 
+  heading = "Model 2",
+  newplot = FALSE
+)
+```
+
+Based on the previous plots and tables model 2 seems to be a great model to use. 
+Therefore we chose Model 2 as our model to evaluate on the testing data.
+
+## Assessing and Evaluating the Candidate Model
+
+```{r}
+# Set up testing data results
+  
+testingData$predict <- predict(
+  object = model2,
+  newdata = testingData,
+  type = "response"
+)
+testingData <- testingData %>%
+  mutate(
+    model2Class = case_when(
+      predict > 0.5 ~ "1",
+      .default = "0"
+    )
+  )
+
+# Build Confusion Matrix for Testing Data ----
+testingData %>%
+  tabyl(var1 = model2Class, var2 = HeartDisease) %>%
+  adorn_title(
+    placement = "combined",
+    row_name = "Predicted",
+    col_name = "Actual"
+  ) %>%
+  kable(
+    booktabs = TRUE,
+    align = "c",
+    table.attr = 'data-quarto-disable-processing="true"'
+  ) %>%
+  kable_classic(
+    position = "center",
+    bootstrap_options = "condensed",
+    latex_options = c("HOLD_position"),
+    full_width = FALSE
+  )
+
+```
+
+**Note** 0 is the case of a normal patient and 1 is the case of a patient with heart disease.
+
+```{r}
+par(mar = c(4,0,0,0))
+separationplot(
+  pred = testingData$predict, 
+  actual = testingData$HeartDisease, 
+  type = "rect", 
+  rectborder = "black",
+  col0 = "#eabcc9", 
+  col1 = "#a5b2ca", 
+  line = TRUE, 
+  lwd2 = 2,
+  show.expected = TRUE, 
+  newplot = FALSE
+)
+```
+
+
+
+
+
+This shows the confusion matrix of our testing data and using the naïve decision rule. Our accuracy is approximately 82%, with a sensitivity of 85% and a specificity of 75%. While not as accurate as the training data it isn't that far of. The Separation plot also shows the model does a decent job predicting Heart disease.
+
+In summary, we’ve built a classifier using multiple logistic regression to predict Heart disease. Our chosen model (Model 2) uses the step wise selection to chose predictors to draw upon from.
+
+
+
