@@ -1395,7 +1395,26 @@ kable(
   kable_styling(latex_options = c("HOLD_position"))
 ```
 
-The table above shows as the CP decreases, the decision tree grows more complex with additional splits, and the relative error tends to decrease, indicating a more complex model that may fit the training data better but could be more prone to overfitting.
+CP: The complexity parameter controls the trade-off between the complexity of the tree and its fit to the training data.
+Smaller values of CP result in more complex trees (potentially overfitting the training data), while larger values lead to simpler trees (potentially underfitting the data).
+As we can see the CP gets increasingly lower as the tree gets bigger.
+
+Num.
+of splits: This column represents the number of splits out tree is at.
+Within the first row our tree has not split once, the second row shows our tree has split 1 time, and it keeps going until the last row shows which shows our tree has split 6 times.
+
+Rel.
+error: This column represents the relative error at each split of our tree.
+We can see that with every split the relative error keeps decreasing, meaning our tree is getting better and better each split at being able to predict correctly.
+
+Mean error: This column represents the mean error at each split of our tree.
+Again, the number is going down when we get to more splits, meaning that on average out tree is predicting pretty well.
+
+Std.
+deviation error: Finally, we have a column representing the standard deviation error for each split.
+Our trees std.
+deviation error starts at 0.042 and ends at 0.029, and with this being a low number it means our trees predictions are relatively consistent.
+So our model being alright at the moment for predicting, is also remaining consistent at what it is doing.
 
 ##### Plot View
 
@@ -1411,6 +1430,11 @@ plotcp(
   upper = "size"
 )
 ```
+
+Being shown above is the cp (complexity parameter) plot.
+It is comparing the cp value between the relative error, based on the size of the tree, which is basically what the table above did.
+As the tree gets bigger, the cp value gets lower and the relative error gets lower as well.
+This plot is just giving a different representation of the table from before based only on the relative error.
 
 From the plot CP value below the line is 0.014.
 therefore CP = 0.014
@@ -1489,6 +1513,13 @@ conf_mat(
   )
 ```
 
+Above is a confusion matrix representing people with and without heart disease based on our predictions.
+Based on the matrix we can see that our predictions are very good .
+The matrix has a true positive for people with heart disease at 88, while it has a false negative of 10.
+Showing that of the people with heart disease in the matrix most of them are predicted to be graduated.
+Now for the people with no heart disease, the true negative is 60, while the false positive is 26.
+Showing that of the people with no heart disease in the matrix most are to be predicted correctly.
+
 ```{r HeartPreds, echo=FALSE, message=FALSE, warning=FALSE}
 # Build a data frame with model metrics
 heartPreds <- heartPredictions %>%
@@ -1556,7 +1587,13 @@ modelMetrics %>%
   kable_styling(latex_options = c("HOLD_position"))
 ```
 
-Under the naïve classification rule,The rpart model accuracy is approximately 80.4%, with a sensitivity of approximately 0.698 and a specificity of approximately 89.8%
+Under the naïve classification rule,The rpart model accuracy is approximately 80.4%, with a sensitivity of approximately 0.698 and a specificity of approximately 89.8%.
+
+accuracy: The accuracy column shows the overall accuracy of our model's predictions.
+
+sensitivity: The sensitivity column shows us the measure of how well we predict the positive class.
+
+specificity: The specificity column shows us the measure of how well we predict the negative class.
 
 #### Random Forest Model
 
@@ -1645,7 +1682,7 @@ The figure below gives a visual display of this information.
 
 varImpPlot(
   x = heartForest1,
-  main = "Classifying People with Heart Disease/No Heart Disease"
+  main = "Classifying Peoplw with Heart Disease/No Heart Disease"
 )
 ```
 
@@ -1686,6 +1723,14 @@ conf_mat(
   )%>%
   kable_styling(latex_options = c("HOLD_position"))
 ```
+
+Above is a confusion matrix representing people with and without heart disease based on our predictions in the testing data.
+Based on the matrix we can see that our predictions are very good .
+The matrix has a true positive for people with heart disease at 88, while it has a false negative of 10.
+Showing that of the people with heart disease in the matrix most of them are predicted to be graduated.
+Now for the people with no heart disease, the true negative is 63, while the false positive is 23.
+Showing that of the people with no heart disease in the matrix most are to be predicted correctly.
+So it is not far off of the other matrix, although it is a bit better.
 
 ```{r heartTest, echo=FALSE, message=FALSE, warning=FALSE}
 # Build a data frame with model metrics
@@ -1728,10 +1773,6 @@ modelMetrics <- bind_rows(
 ```
 
 ```{r modelMetricstree, echo=FALSE, message=FALSE, warning=FALSE}
-#| fig.cap = "Accuracy, Sensitivity and Specitivity of Tree ",
-#| fig.height = 4,
-#| fig.width = 6,
-#| fig.pos = "H"
 # Make a nice looking table of model metrics
 modelMetrics %>%
   dplyr::select(model, .metric, .estimate) %>%
@@ -1755,11 +1796,7 @@ modelMetrics %>%
 The Models accuracy is approximately 82.1%, with a sensitivity of approximately 0.733 and a specificity of approximately 78.9%.
 which is a 2% increase for accuracy than the prior tree.
 
-```{r change , echo=FALSE, message=FALSE, warning=FALSE}
-#| fig.cap = " Plot of OOB and Testing Set Errors ",
-#| fig.height = 5,
-#| fig.width = 6,
-#| fig.pos = "H"
+```{r change}
 testingData <- as.data.frame(testingData)
 
 library(dplyr)
@@ -1959,7 +1996,7 @@ From the plot, it's apparent that there are three distinct groups within the dat
 These clusters could be indicative of underlying patterns within the data.
 The plot shows the spread of the data points across the two principal dimensions, marked as Dim1 and Dim2.
 Each cluster is also enveloped in an ellipsis that represents the boundary of the cluster.
-Also very noticeably we can see that the third group is takes over the plot indicating a very large spreadout cluster.
+Also very noticeably we can see that the third group is takes over the plot indicating a very large spread out cluster.
 
 #### Tuning Parameters
 
@@ -2036,7 +2073,7 @@ fviz_nbclust(
 )
 ```
 
-The optimal number of clusters is typically determined by the first significant local maximum of the gap statistic or the smallest number of clusters such that the gap statistic falls within one standard error of its maximum.The visulisation shows that k is 2
+The optimal number of clusters is typically determined by the first significant local maximum of the gap statistic or the smallest number of clusters such that the gap statistic falls within one standard error of its maximum.The visaulization shows that k is 2
 
 ```{r Gap-Statistics2, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Gap Statistic Plot 2 for Determining Number of Clusters",
@@ -2060,7 +2097,7 @@ fviz_gap_stat(
 
 ```
 
-Like the other Gap statistiv The plot suggests that after k=2, the increase in the gap statistic begins to diminish, indicating that additional clusters may not be significant.
+Like the other Gap statistic, the plot suggests that after k=2, the increase in the gap statistic begins to diminish, indicating that additional clusters may not be significant.
 
 Looking at the four visualization they either point to 3 clusters or 2 clusters.
 So we are going to investigate both on them for the remainder of analysis.
@@ -2204,37 +2241,50 @@ The green and blue clusters represent groups of that are more similar to each ot
 
 ## Comparing Modeling Approaches (Logistic Regression, Decision Tree and Clustering)
 
--   `Logistic Regression`: The Logistic regression has stood out the most for its interpretability. We constructed two logistic regression models, each with distinct sets of predictors. Model 1 was a simple logistic regression focusing on 'Oldpeak' as a sole predictor, while Model 2 was a multiple logistic regression model derived from a stepwise selection process. Model 2's performance was superior, as evidenced by higher accuracy, sensitivity (true positive rate), and specificity (true negative rate) scores.The Area Under the Curve (AUC) from ROC curve analysis was also notably better for Model 2, indicating a greater ability to distinguish between the presence and absence of heart disease.
+-   `Logistic Regression`: The Logistic regression has stood out the most for its interpretability. We constructed two logistic regression models, each with distinct sets of predictors. Model 1 was a simple logistic regression focusing on 'Oldpeak' as a sole predictor, while Model 2 was a multiple logistic regression model derived from a stepwise selection process.
 
-    The variables retained in Model 2, such as ST Slope and chest pain type, are clinically relevant indicators of heart disease, validating the model's practical utility. In summary, logistic regression has proven to be a valuable tool in the analysis of heart disease data.
+Model 2's performance was superior, as evidenced by higher accuracy, sensitivity (true positive rate), and specificity (true negative rate) scores.The Area Under the Curve (AUC) from ROC curve analysis was also notably better for Model 2, indicating a greater ability to distinguish between the presence and absence of heart disease.
 
-    \*Logistic regression Overall Accuracy 89% with a sensitivity of 85% and a specificity of 91% \*
+The variables retained in Model 2, such as ST Slope and chest pain type, are clinically relevant indicators of heart disease, validating the model's practical utility.
+In summary, logistic regression has proven to be a valuable tool in the analysis of heart disease data.
 
--   `Decision Tree`: We employed the CART (Classification and Regression Trees) algorithm to develop our decision tree model. The algorithm recursively splits the data into subsets that are as distinct as possible concerning the target variable, which, in our case, was the presence or absence of heart disease. The initial tree, without any constraints, was complex and prone to overfitting. To address this, we pruned the tree using cost complexity pruning, which simplified the model by penalizing overly complex trees.
+-   Logistic regression Overall Accuracy 89% with a sensitivity of 85% and a specificity of 91% \*
 
-    One of the key strengths of decision trees is their visual interpretability. The tree can be plotted, and each node's decisions can be examined to understand the model's classification rules.
+-   `Decision Tree`: We employed the CART (Classification and Regression Trees) algorithm to develop our decision tree model.
+    The algorithm recursively splits the data into subsets that are as distinct as possible concerning the target variable, which, in our case, was the presence or absence of heart disease.
+    The initial tree, without any constraints, was complex and prone to overfitting.
+    To address this, we pruned the tree using cost complexity pruning, which simplified the model by penalizing overly complex trees.
 
-    Compared to logistic regression, decision trees handle non-linear relationships between predictors and the outcome variable more naturally. Uunlike logistic regression which outputs probabilities, decision trees classify patients by splitting the dataset into homogenous subsets based on a series of decisions. However, they can be less stable, as small changes in the data can lead to different splits, and hence, a different tree structure.In summary, decision trees serve as an excellent tool for initial data exploration and hypothesis generation.
+One of the key strengths of decision trees is their visual interpretability.
+The tree can be plotted, and each node's decisions can be examined to understand the model's classification rules.
 
-    *\*Decision Tree overall Accuracy was 82.1% with a sensitivity of approximately 73.3% and a specificity of approximately 78.9%.*\*
+Compared to logistic regression, decision trees handle non-linear relationships between predictors and the outcome variable more naturally.
+Unlike logistic regression which outputs probabilities, decision trees classify patients by splitting the dataset into homogeneous subsets based on a series of decisions.
+However, they can be less stable, as small changes in the data can lead to different splits, and hence, a different tree structure.In summary, decision trees serve as an excellent tool for initial data exploration and hypothesis generation.
 
--   `Clustering Analysis` : Clustering techniques, such as K-means and hierarchical clustering, provide an unsupervised learning approach that can uncover structures within the heart disease dataset. Unlike logistic regression and decision trees, which are supervised and predict an outcome based on input variables, clustering groups data points based on feature similarity without predefined labels.
+-   Decision Tree overall Accuracy was 82.1% with a sensitivity of approximately 73.3% and a specificity of approximately 78.9%.
+    \*
 
-    Hierarchical vs. Non-Hierarchical Clustering Our hierarchical clustering analysis revealed detailed data structures, suggesting diverse subgroups within the heart disease. Non-hierarchical clustering, particularly k-means, gave us clear groupings, allowing us to discern distinct patterns in heart disease.
+-   Clustering Analysis : Clustering techniques, such as K-means and hierarchical clustering, provide an unsupervised learning approach that can uncover structures within the heart disease dataset.
+    Unlike logistic regression and decision trees, which are supervised and predict an outcome based on input variables, clustering groups data points based on feature similarity without predefined labels.
 
-    Hybrid Approach This approach provided a comprehensive picture, for balancing both hierarchical clustering with the precision of k-means. This technique helps solidify our understanding of the natural groupings in the data.
+Hierarchical vs. Non-Hierarchical Clustering Our hierarchical clustering analysis revealed detailed data structures, suggesting diverse subgroups within the heart disease.
+Non-hierarchical clustering, particularly k-means, gave us clear groupings, allowing us to discern distinct patterns in heart disease.
 
-    Clustering can also inform feature engineering for supervised learning and provide exploratory insights that could lead to new hypotheses about heart disease.In summary, clustering provides a valuable unsupervised approach to uncover hidden structures within heart disease data.
+Hybrid Approach This approach provided a comprehensive picture, for balancing both hierarchical clustering with the precision of k-means.
+This technique helps solidify our understanding of the natural groupings in the data.
+
+Clustering can also inform feature engineering for supervised learning and provide exploratory insights that could lead to new hypotheses about heart disease.In summary, clustering provides a valuable unsupervised approach to uncover hidden structures within heart disease data.
 
 ## Discussion and Limitations
 
 Logistic Regression excelled in identifying significant predictors and their respective odds ratios, offering a clear interpretation of risk factors.
 While the decision tree approach provided an intuitive visualization of the decision-making process, highlighting the hierarchical importance of variables.
 As for clustering it revealed the underlying structure in the data without the guidance of a dependent variable.
-It helped to identify natural groupings within the patient data that could correspond to different sub types of heart disease or risk profiles
+It helped to identify natural groupings within the patient data that could correspond to different subtypes of heart disease or risk profiles
 
 Limitations for this study firstly because of the data set itself because it wasn't a very big dataset so it didn't provide enough of information that could be needed to model a better analysis for heart disease.
-Also when doing the clustering it was hard to visualization the the Dendrogram despite increasing size and changing it view.
+Also when doing the clustering it was hard to visualization the Dendrogram despite increasing size and changing it view.
 
 Overall though Logistic regression was able to predict more than the decision tree.
 And comparatively, logistic regression and decision trees offer more direct applicability to prediction tasks in heart disease.
@@ -2266,7 +2316,7 @@ Both authors contributed to ongoing discussions about study design and analysis.
 
 -   Justin Constant contributed to the Clustering Section, Coding, and Writing of the report.
 
--   Evan Settipane to the CART Section(growing tree), Coding, and Writing of the report.
+-   Evan Settipane contributed to the CART Section(growing tree), Coding, Writing of the report, and Editing any errors.
 
 # Code Appendix
 
