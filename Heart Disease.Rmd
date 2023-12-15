@@ -1996,7 +1996,7 @@ From the plot, it's apparent that there are three distinct groups within the dat
 These clusters could be indicative of underlying patterns within the data.
 The plot shows the spread of the data points across the two principal dimensions, marked as Dim1 and Dim2.
 Each cluster is also enveloped in an ellipsis that represents the boundary of the cluster.
-Also very noticeably we can see that the third group is takes over the plot indicating a very large spread out cluster.
+Also very noticeably we can see that the first group takes over the plot indicating a very large spread out cluster.
 
 #### Tuning Parameters
 
