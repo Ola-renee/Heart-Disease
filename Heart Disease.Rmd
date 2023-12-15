@@ -713,7 +713,6 @@ as.data.frame(summary(HeartlogModel1)$coefficients) %>%
   ) %>%
   kable_classic(
     position = "center",
-    bootstrap_options = "condensed",
     latex_options = c("HOLD_position"),
     full_width = FALSE
   )%>%
@@ -781,7 +780,6 @@ trainingResults %>%
   ) %>%
   kable_classic(
     position = "center",
-    bootstrap_options = "condensed",
     latex_options = c("HOLD_position"),
     full_width = FALSE
   )
@@ -907,7 +905,6 @@ as.data.frame(car::vif(Heartlogmodel2)) %>%
   ) %>%
   kable_classic(
     position = "center",
-    bootstrap_options = "condensed",
     latex_options = c("HOLD_position"),
     full_width = FALSE
   )
@@ -952,7 +949,6 @@ trainingResults %>%
   ) %>%
   kable_classic(
     position = "center",
-    bootstrap_options = "condensed",
     latex_options = c("HOLD_position"),
     full_width = FALSE
   )
@@ -1105,7 +1101,6 @@ testingResults %>%
   ) %>%
   kable_classic(
     position = "center",
-    bootstrap_options = "condensed",
     latex_options = c("HOLD_position"),
     full_width = FALSE
   )
@@ -1918,7 +1913,7 @@ hkmeans_tree(
 ```
 The dendrogram shows the initial hierarchical clustering with colored rectangles highlighting the clusters identified by the hybrid approach. Rectangles drawn at different heights indicate potential cluster separations, with red, blue, and green indicating different clusters.
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
+```{r Final Dendrogram, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Final Dendrogram Visualization ",
 #| fig.height = 10,
 #| fig.width = 7
