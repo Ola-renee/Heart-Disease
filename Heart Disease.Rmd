@@ -1645,7 +1645,7 @@ The figure below gives a visual display of this information.
 
 varImpPlot(
   x = heartForest1,
-  main = "Classifying Peoplw with Heart Disease/No Heart Disease"
+  main = "Classifying People with Heart Disease/No Heart Disease"
 )
 ```
 
@@ -1728,6 +1728,10 @@ modelMetrics <- bind_rows(
 ```
 
 ```{r modelMetricstree, echo=FALSE, message=FALSE, warning=FALSE}
+#| fig.cap = "Accuracy, Sensitivity and Specitivity of Tree ",
+#| fig.height = 4,
+#| fig.width = 6,
+#| fig.pos = "H"
 # Make a nice looking table of model metrics
 modelMetrics %>%
   dplyr::select(model, .metric, .estimate) %>%
@@ -1751,7 +1755,11 @@ modelMetrics %>%
 The Models accuracy is approximately 82.1%, with a sensitivity of approximately 0.733 and a specificity of approximately 78.9%.
 which is a 2% increase for accuracy than the prior tree.
 
-```{r change}
+```{r change , echo=FALSE, message=FALSE, warning=FALSE}
+#| fig.cap = " Plot of OOB and Testing Set Errors ",
+#| fig.height = 5,
+#| fig.width = 6,
+#| fig.pos = "H"
 testingData <- as.data.frame(testingData)
 
 library(dplyr)
@@ -2196,49 +2204,37 @@ The green and blue clusters represent groups of that are more similar to each ot
 
 ## Comparing Modeling Approaches (Logistic Regression, Decision Tree and Clustering)
 
--   `Logistic Regression`: The Logistic regression has stood out the most for its interpretability. We constructed two logistic regression models, each with distinct sets of predictors. Model 1 was a simple logistic regression focusing on 'Oldpeak' as a sole predictor, while Model 2 was a multiple logistic regression model derived from a stepwise selection process.
+-   `Logistic Regression`: The Logistic regression has stood out the most for its interpretability. We constructed two logistic regression models, each with distinct sets of predictors. Model 1 was a simple logistic regression focusing on 'Oldpeak' as a sole predictor, while Model 2 was a multiple logistic regression model derived from a stepwise selection process. Model 2's performance was superior, as evidenced by higher accuracy, sensitivity (true positive rate), and specificity (true negative rate) scores.The Area Under the Curve (AUC) from ROC curve analysis was also notably better for Model 2, indicating a greater ability to distinguish between the presence and absence of heart disease.
 
-Model 2's performance was superior, as evidenced by higher accuracy, sensitivity (true positive rate), and specificity (true negative rate) scores.The Area Under the Curve (AUC) from ROC curve analysis was also notably better for Model 2, indicating a greater ability to distinguish between the presence and absence of heart disease.
+    The variables retained in Model 2, such as ST Slope and chest pain type, are clinically relevant indicators of heart disease, validating the model's practical utility. In summary, logistic regression has proven to be a valuable tool in the analysis of heart disease data.
 
-The variables retained in Model 2, such as ST Slope and chest pain type, are clinically relevant indicators of heart disease, validating the model's practical utility.
-In summary, logistic regression has proven to be a valuable tool in the analysis of heart disease data.
+    \*Logistic regression Overall Accuracy 89% with a sensitivity of 85% and a specificity of 91% \*
 
--   Logistic regression Overall Accuracy 89% with a sensitivity of 85% and a specificity of 91% \*
+-   `Decision Tree`: We employed the CART (Classification and Regression Trees) algorithm to develop our decision tree model. The algorithm recursively splits the data into subsets that are as distinct as possible concerning the target variable, which, in our case, was the presence or absence of heart disease. The initial tree, without any constraints, was complex and prone to overfitting. To address this, we pruned the tree using cost complexity pruning, which simplified the model by penalizing overly complex trees.
 
--   `Decision Tree`: We employed the CART (Classification and Regression Trees) algorithm to develop our decision tree model.
-    The algorithm recursively splits the data into subsets that are as distinct as possible concerning the target variable, which, in our case, was the presence or absence of heart disease.
-    The initial tree, without any constraints, was complex and prone to overfitting.
-    To address this, we pruned the tree using cost complexity pruning, which simplified the model by penalizing overly complex trees.
+    One of the key strengths of decision trees is their visual interpretability. The tree can be plotted, and each node's decisions can be examined to understand the model's classification rules.
 
-One of the key strengths of decision trees is their visual interpretability.
-The tree can be plotted, and each node's decisions can be examined to understand the model's classification rules.
+    Compared to logistic regression, decision trees handle non-linear relationships between predictors and the outcome variable more naturally. Uunlike logistic regression which outputs probabilities, decision trees classify patients by splitting the dataset into homogenous subsets based on a series of decisions. However, they can be less stable, as small changes in the data can lead to different splits, and hence, a different tree structure.In summary, decision trees serve as an excellent tool for initial data exploration and hypothesis generation.
 
-Compared to logistic regression, decision trees handle non-linear relationships between predictors and the outcome variable more naturally.Uunlike logistic regression which outputs probabilities, decision trees classify patients by splitting the dataset into homogenous subsets based on a series of decisions.
-However, they can be less stable, as small changes in the data can lead to different splits, and hence, a different tree structure.In summary, decision trees serve as an excellent tool for initial data exploration and hypothesis generation.
+    *\*Decision Tree overall Accuracy was 82.1% with a sensitivity of approximately 73.3% and a specificity of approximately 78.9%.*\*
 
--   Decision Tree overall Accuracy was 82.1% with a sensitivity of approximately 73.3% and a specificity of approximately 78.9%.
-    \*
+-   `Clustering Analysis` : Clustering techniques, such as K-means and hierarchical clustering, provide an unsupervised learning approach that can uncover structures within the heart disease dataset. Unlike logistic regression and decision trees, which are supervised and predict an outcome based on input variables, clustering groups data points based on feature similarity without predefined labels.
 
--   Clustering Analysis : Clustering techniques, such as K-means and hierarchical clustering, provide an unsupervised learning approach that can uncover structures within the heart disease dataset.
-    Unlike logistic regression and decision trees, which are supervised and predict an outcome based on input variables, clustering groups data points based on feature similarity without predefined labels.
+    Hierarchical vs. Non-Hierarchical Clustering Our hierarchical clustering analysis revealed detailed data structures, suggesting diverse subgroups within the heart disease. Non-hierarchical clustering, particularly k-means, gave us clear groupings, allowing us to discern distinct patterns in heart disease.
 
-Hierarchical vs. Non-Hierarchical Clustering Our hierarchical clustering analysis revealed detailed data structures, suggesting diverse subgroups within the heart disease.
-Non-hierarchical clustering, particularly k-means, gave us clear groupings, allowing us to discern distinct patterns in heart disease.
+    Hybrid Approach This approach provided a comprehensive picture, for balancing both hierarchical clustering with the precision of k-means. This technique helps solidify our understanding of the natural groupings in the data.
 
-Hybrid Approach This approach provided a comprehensive picture, for balancing both hierarchical clustering with the precision of k-means.
-This technique helps solidify our understanding of the natural groupings in the data.
-
-Clustering can also inform feature engineering for supervised learning and provide exploratory insights that could lead to new hypotheses about heart disease.In summary, clustering provides a valuable unsupervised approach to uncover hidden structures within heart disease data.
+    Clustering can also inform feature engineering for supervised learning and provide exploratory insights that could lead to new hypotheses about heart disease.In summary, clustering provides a valuable unsupervised approach to uncover hidden structures within heart disease data.
 
 ## Discussion and Limitations
 
 Logistic Regression excelled in identifying significant predictors and their respective odds ratios, offering a clear interpretation of risk factors.
 While the decision tree approach provided an intuitive visualization of the decision-making process, highlighting the hierarchical importance of variables.
 As for clustering it revealed the underlying structure in the data without the guidance of a dependent variable.
-It helped to identify natural groupings within the patient data that could correspond to different subtypes of heart disease or risk profiles
+It helped to identify natural groupings within the patient data that could correspond to different sub types of heart disease or risk profiles
 
-Limitations for this study firstly because of the data set itself because it wasnt a very big dataset so it didnt provide enough of information that could be needed to model a better analysis for heart disease.
-Also when doing the clutering it was hard to visualisation the the Dendrogram despite increasing size and changing it view.
+Limitations for this study firstly because of the data set itself because it wasn't a very big dataset so it didn't provide enough of information that could be needed to model a better analysis for heart disease.
+Also when doing the clustering it was hard to visualization the the Dendrogram despite increasing size and changing it view.
 
 Overall though Logistic regression was able to predict more than the decision tree.
 And comparatively, logistic regression and decision trees offer more direct applicability to prediction tasks in heart disease.
