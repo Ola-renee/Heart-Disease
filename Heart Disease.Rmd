@@ -341,7 +341,8 @@ Age is a well-known risk factor for heart disease, with the risk increasing as p
 ```{r Heart-Disease-Age, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap="Boxplot of Age by Heart Disease Status",
 #| fig.height=4, 
-#| fig.width=6
+#| fig.width=6,
+#| fig.pos = "H"
 ggplot(heart_data) +
   aes(x = HeartDisease, y = Age) +
   geom_boxplot(fill = c("dark green", "brown")) +
@@ -356,7 +357,8 @@ In this analysis, we explore the prevalence of heart disease across different se
 ```{r Heart-Disease-Sex, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Bar Chart of Heart Disease Distribution by Sex",
 #| fig.height = 4,
-#| fig.width = 6
+#| fig.width = 6,
+#| fig.pos = "H"
 ggplot(heart_data, aes(x = Sex, fill = HeartDisease)) +
   geom_bar(position = "dodge", color = "black") +
   labs(title = "Heart Disease by Sex", x = "Sex", y = "Count", fill = "Heart Disease") +
@@ -373,7 +375,8 @@ ggplot(heart_data, aes(x = Sex, fill = HeartDisease)) +
 ```{r Heart-Disease-Exercise Angina, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Bar Chart of Exercise Angina Distribution by Heart Disease",
 #| fig.height = 4,
-#| fig.width = 6
+#| fig.width = 6,
+#| fig.pos = "H"
 ggplot(heart_data) +
   aes(x = ExerciseAngina, fill = HeartDisease) +
   geom_bar(color = "black") +
@@ -394,7 +397,8 @@ Maximum heart rate (MaxHR) achieved during stress testing is a significant indic
 ```{r Heart-Disease-MaxHR, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Boxplot of MaxHR by Heart Disease Status",
 #| fig.height = 4,
-#| fig.width = 6
+#| fig.width = 6,
+#| fig.pos = "H"
 ggplot(heart_data) +
   aes(x = MaxHR, fill = HeartDisease) +
   geom_boxplot(color = "black") +
@@ -416,7 +420,8 @@ Oldpeak is a measurement derived from an exercise stress test and refers to the 
 ```{r Heart-Disease-Oldpeak, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Boxplot of Oldpeak by Heart Disease Status",
 #| fig.height = 4,
-#| fig.width = 6
+#| fig.width = 6,
+#| fig.pos = "H"
 ggplot(heart_data) +
   aes(x = Oldpeak, fill = HeartDisease) +
   geom_boxplot() +
@@ -435,7 +440,8 @@ The comparison of Oldpeak values between individuals with and without heart dise
 ```{r Heart-Disease-STSlope, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Bar Chart of ST Slope Distribution by Heart Disease",
 #| fig.height = 4,
-#| fig.width = 6
+#| fig.width = 6,
+#| fig.pos = "H"
 ggplot(heart_data) +
   aes(x = ST_Slope, fill = HeartDisease) +
   geom_bar(color = "black") +
@@ -454,7 +460,8 @@ Upsloping ST Slope which is typically associated with a lower risk of heart dise
 ```{r Heart-Disease-Chest-Pain, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Line Plot of Frequency of Heart Disease by Chest Pain Type",
 #| fig.height = 4,
-#| fig.width = 6
+#| fig.width = 6,
+#| fig.pos = "H"
 # Assuming 'heart' data frame is already loaded and HeartDisease is converted to a factor
 chest_pain_counts <- heart_data %>%
   group_by(ChestPainType, HeartDisease) %>%
@@ -476,7 +483,8 @@ The frequency of chest pain types relative to heart disease status shows the com
 ```{r Heart-Disease-Resting-ECG, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Bar Chart of Resting ECG Distribution by Heart Disease",
 #| fig.height = 4,
-#| fig.width = 6
+#| fig.width = 6,
+#| fig.pos = "H"
 ggplot(heart_data, aes(x = RestingECG, fill = HeartDisease)) +
   geom_bar(position = "dodge", color = "black") +
   labs(title = "Heart Disease by Resting ECG ", x = "Resting ECG", y = "Count", fill = "Heart Disease") +
@@ -493,7 +501,8 @@ The distribution across these categories emphasizes the importance of resting EC
 ```{r Heart-Disease-Exercise-Angina, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Bar Chart of Exercise Angina Distribution by Heart Disease",
 #| fig.height = 4,
-#| fig.width = 6
+#| fig.width = 6,
+#| fig.pos = "H"
 ggplot(heart_data, aes(x = ExerciseAngina, fill = HeartDisease)) +
   geom_bar(position = "dodge", color = "black") +
   labs(title = "Heart Disease by Exercise Angina", x = "Exercise Angina", y = "Count") +
@@ -508,7 +517,8 @@ Cholesterol levels are a factors in assessing cardiovascular risk; elevated chol
 ```{r Heart-Disease-Cholesterol, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Boxplot of Cholesterol by Heart Disease Status",
 #| fig.height = 4,
-#| fig.width = 6
+#| fig.width = 6,
+#| fig.pos = "H"
 ggplot(heart_data) +
   aes(x = HeartDisease, y = Cholesterol) +
   geom_boxplot(fill = c("No" = "blue", "Yes" = "orangered2")) +
@@ -524,7 +534,8 @@ Resting blood pressure is a fundamental measure of cardiovascular health. Elevat
 ```{r Heart-Disease-RestingBP, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Boxplot of Resting Blood Pressure by Heart Disease Status",
 #| fig.height = 4,
-#| fig.width = 6
+#| fig.width = 6,
+#| fig.pos = "H"
 ggplot(heart_data, aes(x = HeartDisease, y = RestingBP)) +
   geom_boxplot(fill = c("No" = "blue", "Yes" = "orangered2")) +
   labs(title = "Heart Disease by Resting Blood Pressure", x = "Heart Disease", y = "Resting Blood Pressure") +
@@ -544,8 +555,8 @@ Lighter shades of blue or red indicate weaker correlations.
 ```{r Correlation-Plot, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Correlation Matrix of Numerical Variables",
 #| fig.height = 5,
-#| fig.width = 7
-
+#| fig.width = 7,
+#| fig.pos = "H"
 heart_data_num <- heart
 heart_data_num$ExerciseAngina <- ifelse(heart_data_num$ExerciseAngina == "Y", 1, 0)
 heart_data_num$HeartDisease <- as.numeric(heart_data_num$HeartDisease)
@@ -569,8 +580,8 @@ The heat map provides a visual representation of the frequency of chest pain typ
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Heatmap of RestingECG and ChestPainType",
 #| fig.height = 4,
-#| fig.width = 6
-
+#| fig.width = 6,
+#| fig.pos = "H"
 # Matrix of counts
 counts <- table(heart_data$RestingECG, heart_data$ChestPainType)
 
@@ -678,8 +689,8 @@ We will present our results in three parts. First, we'll discuss the two initial
 ```{r HeartlogModel1Table, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Coefficient Table for Logistic Regression Model 1",
 #| fig.height = 4,
-#| fig.width = 6
-
+#| fig.width = 6,
+#| fig.pos = "H"
 # Model 1 Coefficient Table ----
 as.data.frame(summary(HeartlogModel1)$coefficients) %>%
   rownames_to_column(var = "term") %>%
@@ -794,8 +805,8 @@ This model's accuracy is approximately 71% , with a sensitivity of 69% and a spe
 ```{r HeartlogModel2Table, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Coefficient Table for Logistic Regression Model 2",
 #| fig.height = 4,
-#| fig.width = 6
-
+#| fig.width = 6,
+#| fig.pos = "H"
 
 # Model 2 Coefficient Table ----
 as.data.frame(summary(Heartlogmodel2)$coefficients) %>%
@@ -860,7 +871,8 @@ Attribute such as Fasting blood sugar(FastingBS), Oldpeak (ST depression), and E
 ```{r Tukey-Anscombe-Plot-Model2, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Tukey-Anscombe Plot for Logistic Regression Model 2",
 #| fig.height = 4,
-#| fig.width = 6
+#| fig.width = 6,
+#| fig.pos = "H"
 # Build Tukey-Anscombe plot for Model 2 ----
 ggplot(
   data = data.frame(
@@ -892,7 +904,8 @@ Above shows the Tukey-Anscombe plot using Pearson residuals for Model 2. We can 
 ```{r GVIF-Model2, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Generalized Variance Inflation Factors for Model 2",
 #| fig.height = 4,
-#| fig.width = 6
+#| fig.width = 6,
+#| fig.pos = "H"
 # Find GVIF for Model 2 and build a table ----
 as.data.frame(car::vif(Heartlogmodel2)) %>%
   rownames_to_column(var = "term") %>%
@@ -917,7 +930,8 @@ The table above shows the generalized variance inflation factors for candidate M
 ```{r Confusion-Matrix-Model 2, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Confusion Matrix for Predictions by Model 2",
 #| fig.height = 4,
-#| fig.width = 6
+#| fig.width = 6,
+#| fig.pos = "H"
 
 # Stored fitted values for Model 2 ----
 trainingResults$Heartlogmodel2Pred <- predict(
@@ -963,7 +977,8 @@ This model's accuracy is approximately 89%, with a sensitivity of 85% and a spec
 ```{r HeartModels-ROC, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "ROC Curves for Models 1 and 2",
 #| fig.height = 4,
-#| fig.width = 6
+#| fig.width = 6,
+#| fig.pos = "H"
 
 # Fit ROC Curves ----
 ## Model 1
@@ -1073,7 +1088,8 @@ Based on the previous plots and tables model 2 seems to be a great model to use.
 ```{r Testing-Data-Confusion-Matrix-Model2, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Confusion Matrix for Testing Data on Model 2",
 #| fig.height = 4,
-#| fig.width = 6
+#| fig.width = 6,
+#| fig.pos = "H"
 testingResults$predict <- predict(
   object = Heartlogmodel2,
   newdata = testingData,
@@ -1110,7 +1126,8 @@ testingResults %>%
 ```{r Separation-Plot-Testing-Model2, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Separation Plot for Testing Data on Model 2",
 #| fig.height = 4,
-#| fig.width = 6
+#| fig.width = 6,
+#| fig.pos = "H"
 testingResults$HeartDisease <- as.vector(testingResults$HeartDisease)
 par(mar = c(4,0,0,0))
 separationplot(
@@ -1328,7 +1345,8 @@ heartPredictions <- cbind(
 ```{r treematrix, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Confusion Matrix for the Pruned Decision Tree Model",
 #| fig.height = 4,
-#| fig.width = 6
+#| fig.width = 6,
+#| fig.pos = "H"
 heartPredictions$HeartDisease <- as.factor(heartPredictions$HeartDisease)
 # Build confusion matrix for second rpart model
 conf_mat(
@@ -1396,7 +1414,8 @@ The shows the accuracy, sensitivity, and specificity for the final model we crea
 ```{r modelMetrics, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Model Metrics for the Pruned Decision Tree Model",
 #| fig.height = 4,
-#| fig.width = 6
+#| fig.width = 6,
+#| fig.pos = "H"
 # Make a nice looking table of model metrics
 modelMetrics %>%
   dplyr::select(model, .metric, .estimate) %>%
@@ -1436,7 +1455,8 @@ heartForest1 <- randomForest(
 ```{r Out-of-Bag, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Out-of-bag Error and Misclassification",
 #| fig.height = 4,
-#| fig.width = 6
+#| fig.width = 6,
+#| fig.pos = "H"
 # Create a line plot of OOB Error and Misclassification Rates
 as.data.frame(heartForest1$err.rate) %>%
   mutate(
@@ -1466,7 +1486,8 @@ The plot above shows the Out-of-Bag Error rates as well as the misclassification
 ```{r Attribute-Importance, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Variable Importance in the Random Forest Model",
 #| fig.height = 4,
-#| fig.width = 6
+#| fig.width = 6,
+#| fig.pos = "H"
 # Display attribute importance in a table
 importance(heartForest1) %>%
   kable(
@@ -1486,11 +1507,12 @@ The table shows us each of the attributes we put into the pool of predictors/fac
 ```{r Importance-Plot, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Variable Importance Plot for Model",
 #| fig.height = 4,
-#| fig.width = 6
+#| fig.width = 6,
+#| fig.pos = "H"
 
 varImpPlot(
   x = heartForest1,
-  main = "Classifying Graduated/Not Graduated Students"
+  main = "Classifying Peoplw with Heart Disease/No Heart Disease"
 )
 ```
 We can see from the visulisation above that ST_Slope appears to be the most significant variable, showing the highest decrease in accuracy and Gini when omitted, indicating a strong relationship with heart disease presence.Sex and Chest Pain Type are also important predictors, for distinguishing between the presence and absence of heart disease, as reflected in their accuracy decrease. MaxHR (Maximum heart rate) and ExerciseAngina (chest pain induced by exercise) also have notable importance in prediction of heart Disease.
@@ -1500,7 +1522,8 @@ We can see from the visulisation above that ST_Slope appears to be the most sign
 ```{r Testing-result, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Confusion Matrix for Random Forest Model ",
 #| fig.height = 4,
-#| fig.width = 6
+#| fig.width = 6,
+#| fig.pos = "H"
 
 # Predict new observations
 testingResults <- testingData
@@ -1655,7 +1678,8 @@ For our clustering analysis, we have decided to use the Euclidean distance metri
 ```{r Distance-Matrix-Map,echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Heat Map of Heart Disease Distance Matrix",
 #| fig.height = 5,
-#| fig.width = 7
+#| fig.width = 7,
+#| fig.pos = "H"
 fviz_dist(
   dist.obj = distHeart,
   order = TRUE,
@@ -1679,7 +1703,8 @@ hcHeart <- hclust(
 ```{r Hierarchical-Clustering-Visualization, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Dendrogram Visualization of Hierarchical Clustering",
 #| fig.height = 20,
-#| fig.width = 7
+#| fig.width = 7,
+#| fig.pos = "H"
 # Add customization to base R via dendrogram object ----
 par(mar = c(4,0,0,0), cex = 0.5)
 plot(
@@ -1709,7 +1734,8 @@ kmHeart <- kmeans(
 ```{r k-Means-Cluster-Visualization,echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "k-Means Cluster Plot",
 #| fig.height = 5,
-#| fig.width = 7
+#| fig.width = 7,
+#| fig.pos = "H"
 
 # View k-means cluster results ----
 # library(factoextra)
@@ -1733,7 +1759,8 @@ Using a scree plot to we identify the ideal number of clusters via the k-means a
 ```{r Scree-Plot,echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Scree Plot for Choosing Optimal Number of Clusters",
 #| fig.height = 5,
-#| fig.width = 7
+#| fig.width = 7,
+#| fig.pos = "H"
 
 coreHeart <- as.data.frame(coreHeart)
 set.seed(380)
@@ -1754,7 +1781,8 @@ Average Silhouette method is a means to validate the consistency within clusters
 ```{r Silhouette-Method,echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Silhouette Method for Clustering",
 #| fig.height = 5,
-#| fig.width = 7
+#| fig.width = 7,
+#| fig.pos = "H"
 # Create average silhouette plot for choosing k ----
 set.seed(380)
 fviz_nbclust(
@@ -1773,7 +1801,8 @@ The gap statistic plot below shows the x-axis which represents the number of clu
 ```{r Gap-Statistics1, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Gap Statistic Plot 1 for Determining Number of Clusters",
 #| fig.height = 5,
-#| fig.width = 7
+#| fig.width = 7,
+#| fig.pos = "H"
 # Create Gap Statistic plot for choosing k ----
 set.seed(380)
 fviz_nbclust(
@@ -1790,7 +1819,8 @@ The optimal number of clusters is typically determined by the first significant 
 ```{r Gap-Statistics2, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Gap Statistic Plot 2 for Determining Number of Clusters",
 #| fig.height = 5,
-#| fig.width = 7
+#| fig.width = 7,
+#| fig.pos = "H"
 # Create Gap Statistic plot for choosing k ----
 set.seed(380)
 HeartGap <- clusGap(
@@ -1826,7 +1856,8 @@ cleanHeart <- cleanHeart %>%
 ```{r Visualisation-Dendrogram-cutK2, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Dendrogram Visualization K = 2 ",
 #| fig.height = 10,
-#| fig.width = 7
+#| fig.width = 7,
+#| fig.pos = "H"
 par(mar = c(4,0,0,0), cex = 0.5)
 plot(
   as.dendrogram(
@@ -1848,7 +1879,8 @@ In the dendrogram above, we illustrate the hierarchical clustering of our heart 
 ```{r Visualisation-Dendrogram-cutK3, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Dendrogram Visualization K = 3 ",
 #| fig.height = 10,
-#| fig.width = 7
+#| fig.width = 7,
+#| fig.pos = "H"
 # Base R----
 plot(hcHeart, cex = 0.4)
 rect.hclust(
@@ -1888,7 +1920,8 @@ In our clustering analysis, we decided to use a hybrid approach that intertwines
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Dendrogram Visualization Hybrid ",
 #| fig.height = 10,
-#| fig.width = 7
+#| fig.width = 7,
+#| fig.pos = "H"
 # Hybrid approach to clustering ----
 # library(factoextra)
 hybridHeart <- hkmeans(
@@ -1916,7 +1949,8 @@ The dendrogram shows the initial hierarchical clustering with colored rectangles
 ```{r Final Dendrogram, echo=FALSE, message=FALSE, warning=FALSE}
 #| fig.cap = "Final Dendrogram Visualization ",
 #| fig.height = 10,
-#| fig.width = 7
+#| fig.width = 7,
+#| fig.pos = "H"
 # Plot the final dendrogram for hybrid approach ----
 # library(factoextra)
 fviz_dend(
