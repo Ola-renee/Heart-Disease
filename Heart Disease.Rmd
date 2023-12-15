@@ -1,5 +1,5 @@
 ---
-title: "Predicting Heart Diesea"
+title: "Predicting Heart Disease"
 author: "Olachi Mbakwe, Justin Constant, Rebande Olusesi and Evan Settipane"
 date: "`r Sys.Date()`"
 output:
